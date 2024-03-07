@@ -21,19 +21,19 @@ namespace Oxide.Plugins
 
         private void OnDawn(string msg, bool service)
         {
-            PrintWarning(msg);
+		PrintWarning(msg);
         }
         private void OnNoon(string msg, bool service)
-		{
-				PrintWarning(msg);
-		}
+	{
+		PrintWarning(msg);
+	}
         private void OnDusk(string msg, bool service)
         {
-            PrintWarning(msg);
+		PrintWarning(msg);
         }
         private void OnMidnight(string msg, bool service)
         {
-            PrintWarning(msg);
+		PrintWarning(msg);
         }
         #endregion
     }
