@@ -35,4 +35,4 @@ since Wipe Protection self completes, we dont need an event hook to end it.
           }
         }
 
-The above entry will trigger at 4:14pm on the 6th of each month.
+The above entry will trigger at 4:15pm on the 6th of each month.
