@@ -1,0 +1,12 @@
+{
+  "Timers (event name, event time)": {
+    "Dawn": "07:00",
+    "Noon": "12:00",
+    "Dusk": "18:00",
+    "Midnight": "00:00",
+    "TestStart": "06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00"
+  },
+  "Dates (event name, event date/time)": {
+    "WipeProtectStart": "16:15,03/06,03/25"
+  }
+}
