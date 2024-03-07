@@ -1,7 +1,7 @@
 /*
  * Project Name : Big Ben
  * Created by Grumbo aka slp13at420 aka The Mad Scientist
- * GitHub : https://github.com/BlackWolfsDen/Game-Modz/tree/main/Rust/BigBen
+ * GitHub : https://github.com/BlackWolfsDen/
  * creation start date : 2-29-2024
  * creation finish date : 3-6-2024
  * 
@@ -17,7 +17,7 @@
  *  Designed to eliminate multiple timers that run in mods with just 1 master timer to run all timed mods.
  *  Want your mods to only run during daylight \o/ it can be done !
  *  
- *  example .cs file of subscribing a method --> https://github.com/BlackWolfsDen/Game-Modz/blob/main/Rust/BigBen/BigBenTester.cs
+ *  Project Repo :  --> https://github.com/BlackWolfsDen/Grumboz_Big_Ben/
 */
 
 
@@ -46,10 +46,10 @@ namespace Oxide.Plugins
         #region misc variables
 
         private bool testall = false; // false || true . used for testing all with output to console
-        private bool testtick = false; // false || true .
-        private bool testevent = false; // false || true .
-        private bool testmethod = false; // false || true .
-        private bool announceevents = false; // false || true .
+        private bool testtick = false; // false || true . used to test ticking.
+        private bool testevent = false; // false || true . used to test event circuit.
+        private bool testmethod = false; // false || true . used to test event hook method.
+        private bool announceevents = false; // false || true . allows BigBen to announce when an event hook fires.
         private int tick = 9; // if using a day/nite time manager plugin you may need to decline system_ticks per check here.
         private int tickcnt = 0; // used to store the value of ticks till it passes a check.
         Dictionary<string, string> dbt = new Dictionary<string, string>(); // used to store the time of a time event when last triggered to avoid double triggers.
@@ -155,15 +155,7 @@ namespace Oxide.Plugins
         {
             lang.RegisterMessages(new Dictionary<string, string>
             {
-                ["ArgsReq1"] = "Invalid args use: /teventremove NAME",
-                ["ArgsReq2"] = "Invalid args use: /teventadd NAME,TIME",
-                ["ArgsReq3"] = "Invalid args use: /teventaddDate NAME MM/DD HH:MM",
                 ["NoPerms"] = "You don't have permission to use this command.",
-                ["EventName"] = "Event not found",
-                ["EventAdded"] = "Timed Event {0} was added Time:{1}",
-                ["DateEventAdded"] = "Date Event {0} was added for:(1) at Time:{2}",
-                ["EventTimerRemoved"] = "Event {0} Timer {1} removed",
-                ["EventCleared"] = "All custom Timed Events have been cleared",
                 ["TimedEventList"] = "Custom Timed Events: {0}",
                 ["DateEventList"] = "Custom Date based Events: {0}",
 //
@@ -179,6 +171,7 @@ namespace Oxide.Plugins
 
 /*
  *      its easier and clearer to edit by the json file rather than using the unfinished command structure
+ *      So i may never add ingame commands.
 */
 
         private void EventListCMD(IPlayer player, string command, string[] args)
