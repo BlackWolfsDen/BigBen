@@ -135,7 +135,7 @@ namespace Oxide.Plugins
         #region Init
         private const string permallow = "bigben.allow";
 
-        private List<string> commands = new List<string> { nameof(EventListCMD) }; //nameof(EventAddCMDT), nameof(EventAddCMDD), nameof(EventRemoveCMD), , nameof(EventClearCMD)
+        private List<string> commands = new List<string> { nameof(EventListCMD) };
 
         private void OnServerInitialized()
         {
@@ -167,11 +167,7 @@ namespace Oxide.Plugins
                 ["TimedEventList"] = "Custom Timed Events: {0}",
                 ["DateEventList"] = "Custom Date based Events: {0}",
 //
-                ["EventAddCMDT"] = "bigbenaddTime",
-                ["EventAddCMDD"] = "bigbenaddDate",
-                ["EventRemoveCMD"] = "bigbenremove",
                 ["EventListCMD"] = "bigbenlist",
-                ["EventClearCMD"] = "bigbenclear"
             }, this);
         }
 
@@ -180,79 +176,10 @@ namespace Oxide.Plugins
         //
 
         #region Commands
-// its easier and clearer to edit by the json file than using the unfinished command structure
 
-        private void EventAddCMDT(IPlayer player, string command, string[] args)
-        {
-/*            if (HasPerm(player.Id, permallow))
-            {
-                string[] arg = args.Aggregate((a, b) => a + ' ' + b).Split(',');
-                string key = arg[0];
-
-                    if (arg.Length < 2)
-                    {
-                        Message(player, "ArgsReq2");
-                        return;
-                    }
-                
-                arg[1] = arg[1].Replace(" ", string.Empty);
-
-                    if(!config.Timers.ContainsKey(key))
-                    {
-                        config.Timers[arg[0]] = arg[1];
-                    }
-                    else
-                    {
-                         config.Timers[arg[0]] = (config.Timers[arg[0]] + "," + (arg[1]));
-                    }
-
-                Message(player, "EventAdded", arg[0], arg[1]);
-                UpdateEvents();
-            }
-            else
-            {
-                Message(player, "NoPerms");
-                return; 
-            }
-*/
-        }
-
-        private void EventAddCMDD(IPlayer player, string command, string[] args) 
-        {
-            if (!HasPerm(player.Id, permallow))
-            {
-                Message(player, "NoPerms");
-                return;
-            }
 /*
-            string[] namedatetime = args.Aggregate((a, b) => a + ' ' + b).Split(' '); // (Timers) --> Event_name , Event_Date , Event_Time
-
-            if (namedatetime.Length == 3)
-            {
-                string name = namedatetime[0];
-                string time = namedatetime[1];
-                string date = namedatetime[2];
-
-                config.Dates[name] = (time + "," + date);
-
-                Message(player, "DateEventAdded", name, time, date);
-                UpdateEvents();
-            }
+ *      its easier and clearer to edit by the json file rather than using the unfinished command structure
 */
-        }
-
-        private void EventRemoveCMD(IPlayer player, string command, string[] args)
-        {
-/*
-            if (!HasPerm(player.Id, permallow))
-            {
-                Message(player, "NoPerms");
-                return;
-            }
-                WIP
-                WIP
-*/
-        }
 
         private void EventListCMD(IPlayer player, string command, string[] args)
         {
@@ -263,38 +190,25 @@ namespace Oxide.Plugins
             }
 
             Dictionary<string, string> k = config.Timers;
-            string tmr = string.Empty;
+            string msg = string.Empty;
             
             foreach (KeyValuePair<string, string> v in k)
             {
-                tmr += "" + v.Key + "-[" + v.Value + "]" + ", ";
+                msg += "" + v.Key + "-[" + v.Value + "]" + ", ";
             }
-            Message(player, "TimedEventList", tmr);
+            Message(player, "TimedEventList", msg);
 
             k = null;
             k = config.Dates;
-            tmr = string.Empty;
+            msg = string.Empty;
 
             foreach (KeyValuePair<string, string> v in k)
             {
-                tmr += "" + v.Key + "-[" + v.Value + "]" + ", ";
+                msg += "" + v.Key + "-[" + v.Value + "]" + ", ";
             }
-            Message(player, "DateEventList", tmr);
+            Message(player, "DateEventList", msg);
 
         }
-
-        private void EventClearCMD(IPlayer player, string command, string[] args)
-        {
-/*
-            if (!HasPerm(player.Id, permallow))
-            {
-                Message(player, "NoPerms");
-                return;
-            }
-            WIP
-            WIP
-*/
-            }
 
         #endregion Commands
 
@@ -353,25 +267,28 @@ namespace Oxide.Plugins
         void OnTick()
         {
             /* Core Timer
-             * 
+             *  using OnTick to best adapt for accelerated day/night cycle
             */
 
             if (tickcnt == tick)
             {
                 if (testtick) { PrintWarning("DATE LOOP " + TOD_Sky.Instance.Cycle.DateTime.ToString("HH:mm")); }
 
-                Dictionary<string, string> k = config.Dates;
+                var realdate = System.DateTime.Now.ToString("MM/dd");
+                var realtime = System.DateTime.Now.ToString("HH:mm");
+
+                var datetime = TOD_Sky.Instance.Cycle.DateTime;
+                var gametime = datetime.ToString("HH:mm");
+
+                Dictionary<string, string> k = config.Dates; // searching date timers first
+
                 string tmr = string.Empty;
-                string txt = string.Empty;
                 string key = string.Empty;
                 string value = string.Empty;
                 int size;
                                
                 foreach(KeyValuePair<string, string> v in k) // loop thru date timers parse 1 elemnt to v per loop.
                 {
-                    var datetime = TOD_Sky.Instance.Cycle.DateTime;
-                    var date = System.DateTime.Now.ToString("MM/dd");
-                    var time = System.DateTime.Now.ToString("HH:mm");
                     key = v.Key;
                     value = v.Value;
 
@@ -383,15 +300,15 @@ namespace Oxide.Plugins
 
                     for (int i = 1; i < size; i++) // break single array row into v. (v.Key = name , v.Value = time,date)
                     {
-                        if (arg[0] == time) 
+                        if (arg[0] == realtime) 
                         {
                             if (i >= 1)
                             {
-                                if (arg[i] == date)
+                                if (arg[i] == realdate)
                                 {
-                                    if (dbd[key] != date) // Checks if event name last stored date fails equaling current game date then pass thru.
+                                    if (dbd[key] != realdate) // Checks if event name last stored date fails equaling current game date then pass thru.
                                     {
-                                        dbd[key] = date; // stores new current game time HH:mm to event name of the time check db.
+                                        dbd[key] = realdate; // stores new current game time HH:mm to event name of the time check db.
 
                                         RingEventToPlugins(key, true);
 
@@ -403,18 +320,14 @@ namespace Oxide.Plugins
                     }
                 }
 
-                k = null;
-                k = config.Timers;
+                k = null; // clearing k
+                k = config.Timers; // now searching thru time timers
                 value = null;
 
                 if (testtick) { PrintWarning("TIME LOOP " + TOD_Sky.Instance.Cycle.DateTime.ToString("HH:mm")); }
 
                 foreach (KeyValuePair<string, string> v in k) // Loops thru time timers parses 1 elemnt to v per loop
                 {
-                    var datetime = TOD_Sky.Instance.Cycle.DateTime;
-                    var time = datetime.ToString("HH:mm");
-                    var date = DateTime.Now.ToString("MM/dd");
-
                     key = v.Key;
                     value = v.Value;
 
@@ -425,19 +338,17 @@ namespace Oxide.Plugins
 
                    for (int i = 0; i < size; i++)
                     {
-                        if (testtick || testall){ txt = "" + time + " : " + key + " : " + arg[i] + " : " + tick; }
-                        if (testtick || testall){ PrintWarning(txt); }
+                        if (testtick || testall){ PrintWarning(gametime + " : " + key + " : " + arg[i] + " : " + tick); }
 
-                        if (arg[i] == time) // checks if event time equals current game time.
+                        if (arg[i] == gametime) // checks if event time equals current game time.
                         {
-
                             if (dbt[key] != arg[i]) // Checks if event name last stored time fails equaling current game time.
                             {
                                 dbt[key] = arg[i]; // stores new current game time HH:MM to event name of the time check db.
 
                                 RingEventToPlugins(key, true);
                             
-                                 if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
+                                if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
                             }
                         }
                    }
