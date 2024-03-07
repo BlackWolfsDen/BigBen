@@ -33,4 +33,6 @@ since Wipe Protection self completes, we dont need an event hook to end it.
           "Dates (event name, event date/time)": {
             "WipeProtectStart": "16:15,01/06,02/06,03/06,04/06,05/06,06/06,07/06,08/06,09/06,10/06,11/06,12/06"
           }
-}
+        }
+
+The above entry will trigger at 4:14pm on the 6th of each month.
