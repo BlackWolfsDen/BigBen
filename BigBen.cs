@@ -8,7 +8,7 @@
  * Language : C#
  * Platform : Rust Game Server (Oxide Plugin)
  * Version : 1.1.0
- * Purpose : Game Mod-Command/Control
+ * Purpose : Game Mod-Command/Control by sequencing
  * 
  * Description : 
  *  This creates custom ServerSide global subscribable eventhooks based on game time Now PLUS by date \o/ Im MAD!!.
