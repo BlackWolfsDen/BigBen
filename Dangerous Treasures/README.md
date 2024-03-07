@@ -34,3 +34,6 @@ or simply -->
         }
 
 the method name must match the event hook name 'OnDangerousTreasuresStart' or it wont subscribe.
+
+
+#Remember BigBen will Parse in 'On' at the start of the custom event name so its more relateable as a hook not a method.
