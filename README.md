@@ -12,6 +12,7 @@ This will require basic deveopler knowledge with creating subscribing methods an
 just edit the Json file (there are 5 time based examples allready and 1 date base example added) 
 
 
+/code
 {
   "Timers (event name, event time)": {
     "Dawn": "07:00",
@@ -24,7 +25,7 @@ just edit the Json file (there are 5 time based examples allready and 1 date bas
     "WipeProtectStart": "16:15,03/06,03/25"
   }
 }
-
+/code
 
 the plugin will create a Json fille with the example entries.
 
