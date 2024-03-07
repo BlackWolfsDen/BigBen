@@ -21,7 +21,7 @@ just edit the Json file (there are 5 time based examples allready and 1 date bas
     "Midnight": "00:00",
     "Test": "07:30,08:00,09:01"
   },
-  "Dates (event name, event date/time)": {
+  "Dates (event name, event time/date)": {
     "WipeProtectStart": "16:15,03/06,03/25"
   }
 }
