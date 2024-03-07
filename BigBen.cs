@@ -62,11 +62,11 @@ namespace Oxide.Plugins
         private EventTimes config;
         
 /*
-        Theses 2 tables below (Timers , Dates) contains examples for time of day based timers and date based timers.
-        time based trigger at the set times of day. requires only set times.
+        Theses 2 tables below (Timers , Dates) contains examples for (time of day) based timers and (time of date) based timers.
+        time based trigger at the set times of day everyday. requires only set times.
         date triggered only trigger on the set time for set dates. requires only 1 trigger time and 1 or multiple dates .
 
-                        DONT FORGET COMMAS ,! AND USE JSON FILE TO DO EDITS
+                        DONT FORGET COMMAS ,! AND USE JSON FILE TO DO EDITS and back it up!
 */
    
         public class EventTimes
