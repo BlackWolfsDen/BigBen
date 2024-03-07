@@ -87,7 +87,7 @@ namespace Oxide.Plugins
                 { "WipeProtectStart","08:00,03/05,03/06" },
             };
             /*
-                Above are just pre added examples of event hook name and times.
+                Above are just pre added examples of event hook name and times. BigBen will parse in 'On' to the start of the event name, looks more like a system event hook
              */
 
             public string ToJson() => JsonConvert.SerializeObject(this);
