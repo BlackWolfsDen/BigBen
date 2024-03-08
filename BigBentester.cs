@@ -14,7 +14,9 @@ namespace Oxide.Plugins
 {
     [Info("Grumbo'z BigBen tester", "Grumbo", "1.0")]
     [Description("Tests examples of default Event Hooks")]
-
+/*
+	Below are example of how to subscribe your method to event hooks triggered by Big Ben using  
+*/
     public class BigBentester : RustPlugin
 	{
         #region Oxide Hooks
