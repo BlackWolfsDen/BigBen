@@ -37,7 +37,7 @@ using System.Text;
 
 namespace Oxide.Plugins
 {
-    [Info("Grumbo'z Big Ben", "Grumbo", "1.1.0")]
+    [Info("Grumbo'z Big Ben", "Grumbo", "1.2.0")]
     [Description("Creates Custom Global Subscribable Event Hooks at specific Times of day or days of months ! To automate " +
         "Manual event Plugins or for Centralized control of all your automated Plugins to minimize events accidently starting at the same time.")]
 
@@ -50,8 +50,9 @@ namespace Oxide.Plugins
         private bool testevent = false; // false || true . used to test event circuit.
         private bool testmethod = false; // false || true . used to test event hook method.
         private bool announceevents = false; // false || true . allows BigBen to announce when an event hook fires.
-        private int tick = 9; // if using a day/nite time manager plugin you may need to decline system_ticks per check here.
-        private int tickcnt = 0; // used to store the value of ticks till it passes a check.
+
+        System.Timers.Timer clock = new System.Timers.Timer(); // tictok tictok
+
         Dictionary<string, string> dbt = new Dictionary<string, string>(); // used to store the time of a time event when last triggered to avoid double triggers.
         Dictionary<string, string> dbd = new Dictionary<string, string>(); // used to store the time of a date event when last triggered to avoid double triggers.
 
@@ -60,15 +61,15 @@ namespace Oxide.Plugins
         #region Config        
 
         private EventTimes config;
-        
-/*
-        Theses 2 tables below (Timers , Dates) contains examples for (time of day) based timers and (time of date) based timers.
-        time based trigger at the set times of day everyday. requires only set times.
-        date triggered only trigger on the set time for set dates. requires only 1 trigger time and 1 or multiple dates .
 
-                        DONT FORGET COMMAS ,! AND USE JSON FILE TO DO EDITS and back it up!
-*/
-   
+        /*
+                Theses 2 tables below (Timers , Dates) contains examples for (time of day) based timers and (time of date) based timers.
+                time based trigger at the set times of day everyday. requires only set times.
+                date triggered only trigger on the set time for set dates. requires only 1 trigger time and 1 or multiple dates .
+
+                                DONT FORGET COMMAS ,! AND USE JSON FILE TO DO EDITS and back it up!
+        */
+
         public class EventTimes
         {
             [JsonProperty("Timers (event name, event time)", ObjectCreationHandling = ObjectCreationHandling.Replace)]
@@ -97,7 +98,7 @@ namespace Oxide.Plugins
         }
 
         protected override void LoadDefaultConfig() => config = new EventTimes();
-       
+
         protected override void LoadConfig()
         {
             base.LoadConfig();
@@ -145,7 +146,17 @@ namespace Oxide.Plugins
             //register commands
             commands.ForEach(command => AddLocalizedCommand(command));
 
+            StartClock();
         }
+
+        private void StartClock()
+        {
+            clock.Interval += 750;
+            clock.AutoReset = true;
+            clock.Elapsed += TimedTick; 
+            clock.Start();
+        }
+
         #endregion Init
 
         //
@@ -158,9 +169,10 @@ namespace Oxide.Plugins
                 ["NoPerms"] = "You don't have permission to use this command.",
                 ["TimedEventList"] = "Custom Timed Events: {0}",
                 ["DateEventList"] = "Custom Date based Events: {0}",
-//
+                //
                 ["EventListCMD"] = "bigbenlist",
             }, this);
+
         }
 
         #endregion Localization
@@ -169,10 +181,10 @@ namespace Oxide.Plugins
 
         #region Commands
 
-/*
- *      its easier and clearer to edit by the json file rather than using the unfinished command structure
- *      So i may never add ingame commands.
-*/
+        /*
+         *      its easier and clearer to edit by the json file rather than using the unfinished command structure
+         *      So i may never add ingame commands.
+        */
 
         private void EventListCMD(IPlayer player, string command, string[] args)
         {
@@ -184,7 +196,7 @@ namespace Oxide.Plugins
 
             Dictionary<string, string> k = config.Timers;
             string msg = string.Empty;
-            
+
             foreach (KeyValuePair<string, string> v in k)
             {
                 msg += "" + v.Key + "-[" + v.Value + "]" + ", ";
@@ -250,107 +262,113 @@ namespace Oxide.Plugins
                 if (testevent || testall) { PrintWarning(msg + " Rang out."); }
             }
         }
-        
+
         #endregion Methods
 
         // Engine
 
         #region Oxide Hooks
 
-        void OnTick()
+        void Unload()
+        {
+            clock.Stop();
+            clock.Dispose();
+        }
+
+        void TimedTick(object sender, System.Timers.ElapsedEventArgs e)
         {
             /* Core Timer
              *  using OnTick to best adapt for accelerated day/night cycle
             */
 
-            if (tickcnt == tick)
-            {
-                if (testtick) { PrintWarning("DATE LOOP " + TOD_Sky.Instance.Cycle.DateTime.ToString("HH:mm")); }
+            var realdate = System.DateTime.Now.ToString("MM/dd");
+            var realtime = System.DateTime.Now.ToString("HH:mm");
 
-                var realdate = System.DateTime.Now.ToString("MM/dd");
-                var realtime = System.DateTime.Now.ToString("HH:mm");
+            var datetime = TOD_Sky.Instance.Cycle.DateTime;
+            var gametime = datetime.ToString("HH:mm");
 
-                var datetime = TOD_Sky.Instance.Cycle.DateTime;
-                var gametime = datetime.ToString("HH:mm");
+            Dictionary<string, string> k = config.Dates; // searching date timers first
 
-                Dictionary<string, string> k = config.Dates; // searching date timers first
-
-                string tmr = string.Empty;
-                string key = string.Empty;
-                string value = string.Empty;
-                int size;
+            string tmr = string.Empty;
+            string key = string.Empty;
+            string value = string.Empty;
+            int size;
                                
-                foreach(KeyValuePair<string, string> v in k) // loop thru date timers parse 1 elemnt to v per loop.
+
+            foreach(KeyValuePair<string, string> v in k) // loop thru date timers parse 1 elemnt to v per loop.
+            {
+                key = v.Key;
+                value = v.Value;
+
+                if (!dbd.ContainsKey(key)) { dbd[key] = ""; } // creates new key entry if needed. Date timers
+
+                string[] arg = value.Split(','); // arg[0] = time , arg[1++] dates MM/dd
+
+                size = arg.Length;
+
+            if (testtick) { PrintWarning("DATE LOOP : " + key + ":"); }
+
+            for (int i = 1; i < size; i++) // break single array row into v. (v.Key = name , v.Value = time,date)
                 {
-                    key = v.Key;
-                    value = v.Value;
 
-                    if (!dbd.ContainsKey(key)) { dbd[key] = ""; } // creates new key entry if needed. Date timers
-
-                    string[] arg = value.Split(','); // arg[0] = time , arg[1++] dates MM/dd
-
-                    size = arg.Length;
-
-                    for (int i = 1; i < size; i++) // break single array row into v. (v.Key = name , v.Value = time,date)
+                    if (arg[0] == realtime) 
                     {
-                        if (arg[0] == realtime) 
+                        if (i >= 1)
                         {
-                            if (i >= 1)
+                            if (testtick) { PrintWarning("DATE LOOP : " + arg[1] + ":" + arg[i] + ":" + gametime); }
+
+                            if (arg[i] == realdate)
                             {
-                                if (arg[i] == realdate)
+                                if (dbd[key] != realdate) // Checks if event name last stored date fails equaling current game date then pass thru.
                                 {
-                                    if (dbd[key] != realdate) // Checks if event name last stored date fails equaling current game date then pass thru.
-                                    {
-                                        dbd[key] = realdate; // stores new current game time HH:mm to event name of the time check db.
+                                    dbd[key] = realdate; // stores new current game time HH:mm to event name of the time check db.
 
-                                        RingEventToPlugins(key, true);
+                                    RingEventToPlugins(key, true);
 
-                                        if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
-                                    }
+                                    if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
                                 }
                             }
                         }
                     }
                 }
-
-                k = null; // clearing k
-                k = config.Timers; // now searching thru time timers
-                value = null;
-
-                if (testtick) { PrintWarning("TIME LOOP " + TOD_Sky.Instance.Cycle.DateTime.ToString("HH:mm")); }
-
-                foreach (KeyValuePair<string, string> v in k) // Loops thru time timers parses 1 elemnt to v per loop
-                {
-                    key = v.Key;
-                    value = v.Value;
-
-                    if (!dbt.ContainsKey(key)) { dbt[key] = ""; }
-
-                    string[] arg = value.Split(',');
-                    size = arg.Length;
-
-                   for (int i = 0; i < size; i++)
-                    {
-                        if (testtick || testall){ PrintWarning(gametime + " : " + key + " : " + arg[i] + " : " + tick); }
-
-                        if (arg[i] == gametime) // checks if event time equals current game time.
-                        {
-                            if (dbt[key] != arg[i]) // Checks if event name last stored time fails equaling current game time.
-                            {
-                                dbt[key] = arg[i]; // stores new current game time HH:MM to event name of the time check db.
-
-                                RingEventToPlugins(key, true);
-                            
-                                if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
-                            }
-                        }
-                   }
-                }
-
-                tickcnt = 0;
             }
 
-            tickcnt++;
+            k = null; // clearing k
+            k = config.Timers; // now searching thru time timers
+            value = null;
+
+            if (testtick) { PrintWarning("TIME LOOP " + gametime); }
+
+            foreach (KeyValuePair<string, string> v in k) // Loops thru time timers parses 1 elemnt to v per loop
+            {
+                key = v.Key;
+                value = v.Value;
+
+                if (!dbt.ContainsKey(key)) { dbt[key] = ""; }
+
+                string[] arg = value.Split(',');
+                size = arg.Length;
+
+                for (int i = 0; i < size; i++)
+                {
+                    if (testtick || testall){ PrintWarning(key + " : " + arg[i] + " : " + gametime); }
+
+                    if (arg[i] == gametime) // checks if event time equals current game time.
+                    {
+
+                        if (testtick || testall) { PrintWarning(arg[i] + gametime); }
+
+                        if (dbt[key] != arg[i]) // Checks if event name last stored time fails equaling current game time.
+                        {
+                            dbt[key] = arg[i]; // stores new current game time HH:MM to event name of the time check db.
+                            
+                            if (announceevents) { PrintWarning("" + key + " : " + arg[i]); }
+
+                            RingEventToPlugins(key, true);
+                        }
+                    }
+                }
+            }
         }
 
         #endregion
