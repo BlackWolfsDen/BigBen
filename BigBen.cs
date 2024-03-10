@@ -3,7 +3,7 @@
  * Created by Grumbo aka slp13at420 aka The Mad Scientist
  * GitHub : https://github.com/BlackWolfsDen/
  * creation start date : 2-29-2024
- * creation finish date : 3-9-2024
+ * creation finish date : 3-6-2024
  * 
  * Language : C#
  * Platform : Rust Game Server (Oxide Plugin)
@@ -67,11 +67,18 @@ namespace Oxide.Plugins
                 time based trigger at the set times of day everyday. requires only set times.
                 date triggered only trigger on the set time for set dates. requires only 1 trigger time and 1 or multiple dates .
 
-                                DONT FORGET COMMAS ,! AND USE JSON FILE TO DO EDITS and back it up!
+                                USE JSON FILE TO DO EDITS and DONT FORGET COMMAS ,! AND back it up!
         */
 
         public class EventTimes
         {
+            [JsonProperty("Settings (setting, value)", ObjectCreationHandling = ObjectCreationHandling.Replace)]
+            public Dictionary<string, string> Settings = new Dictionary<string, string>()
+            {
+                {"How often in milliseconds does it check the game time.","" },
+                { "CheckInterval","750" }
+            };
+
             [JsonProperty("Timers (event name, event time)", ObjectCreationHandling = ObjectCreationHandling.Replace)]
             public Dictionary<string, string> Timers = new Dictionary<string, string>()
             {
@@ -151,7 +158,7 @@ namespace Oxide.Plugins
 
         private void StartClock()
         {
-            clock.Interval += 750;
+            clock.Interval += Int32.Parse(config.Settings["CheckInterval"]);
             clock.AutoReset = true;
             clock.Elapsed += TimedTick; 
             clock.Start();
