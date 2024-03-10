@@ -24,7 +24,10 @@ at line 2456 you will find the event hook subriber method. -->
               i.e.  "DangerousTreasuresStart": "06:00,12:00,18:00,00:00"
 
             */
-            var chest = TryOpenEvent();
+            if (treasureChests.Count < config.Event.Max)
+            {
+                var chest = TryOpenEvent();
+            }
         }
 or simply -->
 
