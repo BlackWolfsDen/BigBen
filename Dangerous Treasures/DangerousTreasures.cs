@@ -2462,7 +2462,10 @@ namespace Oxide.Plugins
               i.e.  "DangerousTreasuresStart": "06:00,12:00,18:00,00:00"
 
             */
-            var chest = TryOpenEvent();
+            if (treasureChests.Count < config.Event.Max)
+            {
+                var chest = TryOpenEvent();
+            }
         }
 
         void OnServerInitialized(bool isStartup)
