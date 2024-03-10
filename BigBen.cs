@@ -7,7 +7,7 @@
  * 
  * Language : C#
  * Platform : Rust Game Server (Oxide Plugin)
- * Version : 1.1.0
+ * Version : 1.2.0
  * Purpose : Game Mod-Command/Control by sequencing
  * 
  * Description : 
