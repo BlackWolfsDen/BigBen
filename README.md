@@ -9,7 +9,7 @@ why not streamline the process of when your plugins activate and create a seamle
 That is where this clock rings the loudest.
 you can create a global custom event hook that can trigger specific hours of the day OR 1 specific time of every month/day .
 This will require basic deveopler knowledge with creating subscribing methods and C# plugin editing disableing internal timers.
-just edit the Json file (there are 5 time based examples allready and 1 date base example added) 
+Just edit the Json file (there are 5 time based examples allready and 1 date base example added) 
 
 
 
