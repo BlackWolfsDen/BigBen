@@ -169,7 +169,7 @@ namespace Oxide.Plugins
         //
 
         #region Localization
-        protected override void LoadDefaultMessages()
+        protected override void LoadDefaultMessages() // do we really need these .... probably removeable
         {
             lang.RegisterMessages(new Dictionary<string, string>
             {
